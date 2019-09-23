@@ -21,25 +21,17 @@
 
         {% block header %}
             <header>
-                <div class="navbar navbar-default navbar-static-top" role="navigation">
+                <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
                     <div class="container">
-                        <div class="navbar-header col-md-3 col-lg-2">
-                            <a class="navbar-brand" href="{{ path('homepage') }}">
-                                Symfony Demo
-                            </a>
+                        <a class="navbar-brand" href="{{ path('homepage') }}">
+                            Symfony Demo
+                        </a>
+                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
 
-                            <button type="button" class="navbar-toggle"
-                                    data-toggle="collapse"
-                                    data-target=".navbar-collapse">
-                                <span class="sr-only">{{ 'menu.toggle_nav'|trans }}</span>
-                                <span class="icon-bar"></span>
-                                <span class="icon-bar"></span>
-                                <span class="icon-bar"></span>
-                            </button>
-                        </div>
-                        <div class="navbar-collapse collapse">
-                            <ul class="nav navbar-nav navbar-right">
-
+                        <div class="collapse navbar-collapse" id="navbarColor01">
+                            <ul class="navbar-nav">
                                 {% block header_navigation_links %}
                                     <li>
                                         <a href="{{ path('blog_index') }}">
@@ -98,7 +90,7 @@
                             </ul>
                         </div>
                     </div>
-                </div>
+                </nav>
             </header>
         {% endblock %}
 

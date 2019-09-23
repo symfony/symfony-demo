@@ -4,12 +4,12 @@
 $web-font-path: 'data:text/css;base64,';
 
 // Make sure the bootstrap-sass and lato fonts are resolved correctly
-$icon-font-path: "~bootstrap-sass/assets/fonts/bootstrap/";
 $lato-font-path: '~lato-font/fonts';
 
-@import "~bootswatch/flatly/variables";
-@import "~bootstrap-sass/assets/stylesheets/bootstrap";
-@import "~bootswatch/flatly/bootswatch";
+@import "~bootswatch/dist/flatly/variables";
+@import "~bootstrap/scss/bootstrap";
+@import "~bootstrap/scss/transitions";
+@import "~bootswatch/dist/flatly/bootswatch";
 @import "~@fortawesome/fontawesome-free/css/all.css";
 @import "~@fortawesome/fontawesome-free/css/v4-shims.css";
 @import "~highlight.js/styles/solarized-light.css";
@@ -21,6 +21,11 @@ $lato-font-path: '~lato-font/fonts';
 
 /* Basic styles
    ------------------------------------------------------------------------- */
+h1 {
+  font-size: 39px;
+  margin-top: 21px;
+  margin-bottom: 10.5px
+}
 p, ul, ol {
   font-size: 19px;
   margin-bottom: 1.5em
@@ -68,16 +73,35 @@ header {
   margin-bottom: 2em
 }
 
-header ul.nav li {
-  margin-bottom: 0
+.navbar-expand-lg .navbar-collapse {
+  justify-content: flex-end;
 }
 
+header ul.nav li {
+  margin-bottom: 0;
+}
+.navbar-nav > li {
+  margin: 5px 10px;
+}
+header nav a {
+  color: white;
+}
+header nav a:hover {
+  color: #18BC9C;
+  text-decoration: none;
+}
+header .dropdown-menu a {
+  color: #212529 !important;
+}
 header .locales {
-  min-width: 190px;
+  min-width: 195px;
+  margin: 2px 5px;
 }
 header .locales a {
   color: #212529;
-  padding: 3px 15px;
+}
+header .locales li, .user > li {
+  padding: 0 10px;
 }
 header .locales a small {
   border-radius: 4px;
@@ -111,6 +135,19 @@ header .locales a:hover small {
   margin-bottom: 2em
 }
 
+#sidebar .well {
+  min-height: 20px;
+  margin-bottom: 20px;
+  background-color: #ecf0f1;
+  border: 1px solid transparent;
+  box-shadow: none;
+}
+
+#sidebar .well-lg {
+  padding: 24px;
+  border-radius: 6px;
+}
+
 #sidebar p {
   font-size: 15px
 }
@@ -142,9 +179,29 @@ footer #footer-resources i {
   margin-left: 0.5em
 }
 
+@media (min-width: 992px) {
+
+  .modal-lg, .modal-xl {
+    max-width: 900px;
+  }
+
+  .modal-dialog {
+    margin: 30px auto;
+  }
+
+}
+
+#sourceCodeModal .modal-header {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row-reverse;
+}
+
 #sourceCodeModal h3 {
   font-size: 19px;
-  margin-top: 0
+  margin-top: 0;
+  display: flex;
+  justify-content: space-between;
 }
 
 #sourceCodeModal h3 small {
@@ -154,7 +211,13 @@ footer #footer-resources i {
 
 #sourceCodeModal pre {
   margin-bottom: 2em;
-  padding: 0
+  padding: 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+pre code {
+  white-space: pre-wrap;
 }
 
 #confirmationModal .modal-dialog {
@@ -224,6 +287,12 @@ body#homepage {
   text-align: center
 }
 
+.page-header {
+  padding-bottom: 9.5px;
+  margin: 42px 0 21px;
+  border-bottom: 1px solid transparent;
+}
+
 /* Page: 'Login'
    ------------------------------------------------------------------------- */
 body#login #login-users-help p {
@@ -276,12 +345,13 @@ body#blog_index .post-metadata {
   margin-bottom: 8px;
 }
 
-body#blog_index .post-tags .label-default {
+.badge-light {
   background-color: #e9ecec;
   color: #6d8283;
 }
-body#blog_index .post-tags .label-default i {
-  color: #a3b2b2;
+
+.pagination {
+  justify-content: center;
 }
 
 /* Page: 'Blog post show'

@@ -14,6 +14,9 @@ cache:
     - $HOME/.symfony
 
 env:
+  - DB=sqlite
+  - DB=mysql
+  - DB=pgsql
   global:
     # Symfony's PHPUnit bridge provides a modified version of PHPUnit. The modified PHPUnit is
     # written to a directory that can be configured by the SYMFONY_PHPUNIT_DIR env var, or in
@@ -55,6 +58,12 @@ install:
   # Install or update Composer packages including dev dependencies listed in require-dev.
   - composer $ACTION
   - ./bin/phpunit install
+
+before_script:
+  - echo "$DB"
+  - cp phpunit.xml.dist phpunit.xml
+  - if [[ "$DB" == "mysql" || "$DB" == "mariadb" ]]; then sed -i 's/sqlite:\/\/\/var\/data\/blog_test\.sqlite/mysql:\/\/travis@localhost\/test/' phpunit.xml; fi
+  - if [[ "$DB" == "pgsql" ]]; then sed -i 's/sqlite:\/\/\/var\/data\/blog_test\.sqlite/postgres:\/\/postgres@localhost\/test/' phpunit.xml; fi
 
 script:
   # There's no need to load data fixtures before running tests because the project

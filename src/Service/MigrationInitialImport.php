@@ -1,45 +1,40 @@
 <?php
 
-/*
- * This file is part of the Symfony package.
- *
- * (c) Fabien Potencier <fabien@symfony.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
-namespace App\DataFixtures;
+namespace App\Service;
 
 use App\Entity\Comment;
 use App\Entity\Post;
 use App\Entity\Tag;
 use App\Entity\User;
-use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Common\Persistence\ObjectManager;
+use App\Utils\Slugger;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-use Symfony\Component\String\Slugger\SluggerInterface;
-use function Symfony\Component\String\u;
 
-class AppFixtures extends Fixture
+class MigrationInitialImport
 {
-    private $passwordEncoder;
-    private $slugger;
 
-    public function __construct(UserPasswordEncoderInterface $passwordEncoder, SluggerInterface $slugger)
+    /**
+     * @var array
+     */
+    static private $references = [];
+
+    /**
+     * @var UserPasswordEncoderInterface
+     */
+    private $passwordEncoder;
+
+    /**
+     * @var ManagerRegistry
+     */
+    private $registry;
+
+    public function __construct(UserPasswordEncoderInterface $passwordEncoder, ManagerRegistry $registry)
     {
         $this->passwordEncoder = $passwordEncoder;
-        $this->slugger = $slugger;
+        $this->registry = $registry;
     }
 
-    public function load(ObjectManager $manager): void
-    {
-        $this->loadUsers($manager);
-        $this->loadTags($manager);
-        $this->loadPosts($manager);
-    }
-
-    private function loadUsers(ObjectManager $manager): void
+    public function importInitialData(): void
     {
         foreach ($this->getUserData() as [$fullname, $username, $password, $email, $roles]) {
             $user = new User();
@@ -49,28 +44,18 @@ class AppFixtures extends Fixture
             $user->setEmail($email);
             $user->setRoles($roles);
 
-            $manager->persist($user);
-            $this->addReference($username, $user);
+            $this->registry->getManagerForClass(User::class)->persist($user);
+            self::$references[$username] = $user;
         }
 
-        $manager->flush();
-    }
-
-    private function loadTags(ObjectManager $manager): void
-    {
         foreach ($this->getTagData() as $index => $name) {
             $tag = new Tag();
             $tag->setName($name);
 
-            $manager->persist($tag);
-            $this->addReference('tag-'.$name, $tag);
+            $this->registry->getManagerForClass(Tag::class)->persist($tag);
+            self::$references['tag-' . $name] = $tag;
         }
 
-        $manager->flush();
-    }
-
-    private function loadPosts(ObjectManager $manager): void
-    {
         foreach ($this->getPostData() as [$title, $slug, $summary, $content, $publishedAt, $author, $tags]) {
             $post = new Post();
             $post->setTitle($title);
@@ -83,17 +68,17 @@ class AppFixtures extends Fixture
 
             foreach (range(1, 5) as $i) {
                 $comment = new Comment();
-                $comment->setAuthor($this->getReference('john_user'));
+                $comment->setAuthor(self::$references['john_user']);
                 $comment->setContent($this->getRandomText(random_int(255, 512)));
                 $comment->setPublishedAt(new \DateTime('now - '.$i.'minutes'));
 
                 $post->addComment($comment);
             }
 
-            $manager->persist($post);
+            $this->registry->getManagerForClass(Post::class)->persist($post);
         }
 
-        $manager->flush();
+        $this->registry->getManager()->flush();
     }
 
     private function getUserData(): array
@@ -121,19 +106,20 @@ class AppFixtures extends Fixture
         ];
     }
 
-    private function getPostData()
+    private function getPostData(): array
     {
         $posts = [];
         foreach ($this->getPhrases() as $i => $title) {
             // $postData = [$title, $slug, $summary, $content, $publishedAt, $author, $tags, $comments];
+            $user = ['jane_admin', 'tom_admin'][0 === $i ? 0 : random_int(0, 1)];
             $posts[] = [
                 $title,
-                $this->slugger->slug($title)->lower(),
+                Slugger::slugify($title),
                 $this->getRandomText(),
                 $this->getPostContent(),
                 new \DateTime('now - '.$i.'days'),
                 // Ensure that the first post is written by Jane Doe to simplify tests
-                $this->getReference(['jane_admin', 'tom_admin'][0 === $i ? 0 : random_int(0, 1)]),
+                self::$references[$user],
                 $this->getRandomTags(),
             ];
         }
@@ -182,10 +168,9 @@ class AppFixtures extends Fixture
         $phrases = $this->getPhrases();
         shuffle($phrases);
 
-        do {
-            $text = u('. ')->join($phrases)->append('.');
+        while (mb_strlen($text = implode('. ', $phrases).'.') > $maxLength) {
             array_pop($phrases);
-        } while ($text->length() > $maxLength);
+        }
 
         return $text;
     }
@@ -236,6 +221,7 @@ MARKDOWN;
         shuffle($tagNames);
         $selectedTags = \array_slice($tagNames, 0, random_int(2, 4));
 
-        return array_map(function ($tagName) { return $this->getReference('tag-'.$tagName); }, $selectedTags);
+        return array_map(function ($tagName) { return self::$references['tag-'.$tagName]; }, $selectedTags);
     }
+
 }

@@ -31,54 +31,42 @@ use Symfony\Component\Validator\Constraints as Assert;
 class User implements UserInterface, \Serializable
 {
     /**
-     * @var int
-     *
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private ?int $id = null;
 
     /**
-     * @var string
-     *
      * @ORM\Column(type="string")
      */
     #[Assert\NotBlank]
-    private $fullName;
+    private ?string $fullName = null;
 
     /**
-     * @var string
-     *
      * @ORM\Column(type="string", unique=true)
      */
     #[
         Assert\NotBlank,
         Assert\Length(min: 2, max: 50)
     ]
-    private $username;
+    private ?string $username = null;
 
     /**
-     * @var string
-     *
      * @ORM\Column(type="string", unique=true)
      */
     #[Assert\Email]
-    private $email;
+    private ?string $email = null;
 
     /**
-     * @var string
-     *
      * @ORM\Column(type="string")
      */
-    private $password;
+    private ?string $password = null;
 
     /**
-     * @var array
-     *
      * @ORM\Column(type="json")
      */
-    private $roles = [];
+    private array $roles = [];
 
     public function getId(): ?int
     {

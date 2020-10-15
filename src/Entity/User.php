@@ -43,25 +43,27 @@ class User implements UserInterface, \Serializable
      * @var string
      *
      * @ORM\Column(type="string")
-     * @Assert\NotBlank()
      */
+    #[Assert\NotBlank]
     private $fullName;
 
     /**
      * @var string
      *
      * @ORM\Column(type="string", unique=true)
-     * @Assert\NotBlank()
-     * @Assert\Length(min=2, max=50)
      */
+    #[
+        Assert\NotBlank,
+        Assert\Length(min: 2, max: 50)
+    ]
     private $username;
 
     /**
      * @var string
      *
      * @ORM\Column(type="string", unique=true)
-     * @Assert\Email()
      */
+    #[Assert\Email]
     private $email;
 
     /**

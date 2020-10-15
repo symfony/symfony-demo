@@ -51,14 +51,16 @@ class Comment
      * @var string
      *
      * @ORM\Column(type="text")
-     * @Assert\NotBlank(message="comment.blank")
-     * @Assert\Length(
-     *     min=5,
-     *     minMessage="comment.too_short",
-     *     max=10000,
-     *     maxMessage="comment.too_long"
-     * )
      */
+    #[
+        Assert\NotBlank(message: 'comment.blank'),
+        Assert\Length(
+            min: 5,
+            minMessage: 'comment.too_short',
+            max: 10000,
+            maxMessage: 'comment.too_long',
+        )
+    ]
     private $content;
 
     /**
@@ -81,9 +83,7 @@ class Comment
         $this->publishedAt = new \DateTime();
     }
 
-    /**
-     * @Assert\IsTrue(message="comment.is_spam")
-     */
+    #[Assert\IsTrue(message: 'comment.is_spam')]
     public function isLegitComment(): bool
     {
         $containsInvalidCharacters = null !== u($this->content)->indexOf('@');

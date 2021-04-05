@@ -36,10 +36,9 @@ use Symfony\Component\Routing\Annotation\Route;
 class BlogController extends AbstractController
 {
     /**
-     * @Cache(smaxage="10")
-     *
      * NOTE: For standard formats, Symfony will also automatically choose the best
      * Content-Type header for the response.
+     *
      * See https://symfony.com/doc/current/routing.html#special-parameters
      */
     #[
@@ -47,6 +46,7 @@ class BlogController extends AbstractController
         Route('/rss.xml', defaults: ['page' => '1', '_format' => 'xml'], methods: ['GET'], name: 'blog_rss'),
         Route('/page/{page<[1-9]\d*>}', defaults: ['_format' => 'html'], methods: ['GET'], name: 'blog_index_paginated'),
     ]
+    #[Cache(smaxage: 10)]
     public function index(Request $request, int $page, string $_format, PostRepository $posts, TagRepository $tags): Response
     {
         $tag = null;
@@ -68,6 +68,7 @@ class BlogController extends AbstractController
      * NOTE: The $post controller argument is automatically injected by Symfony
      * after performing a database query looking for a Post with the 'slug'
      * value given in the route.
+     *
      * See https://symfony.com/doc/current/bundles/SensioFrameworkExtraBundle/annotations/converters.html
      */
     #[Route('/posts/{slug}', methods: ['GET'], name: 'blog_post')]
@@ -84,14 +85,14 @@ class BlogController extends AbstractController
     }
 
     /**
-     * @IsGranted("IS_AUTHENTICATED_FULLY")
-     * @ParamConverter("post", options={"mapping": {"postSlug": "slug"}})
-     *
      * NOTE: The ParamConverter mapping is required because the route parameter
      * (postSlug) doesn't match any of the Doctrine entity properties (slug).
+     *
      * See https://symfony.com/doc/current/bundles/SensioFrameworkExtraBundle/annotations/converters.html#doctrine-converter
      */
     #[Route('/comment/{postSlug}/new', methods: ['POST'], name: 'comment_new')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[ParamConverter('post', options: ['mapping' => ['postSlug' => 'slug']])]
     public function commentNew(Request $request, Post $post, EventDispatcherInterface $eventDispatcher): Response
     {
         $comment = new Comment();

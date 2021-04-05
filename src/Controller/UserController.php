@@ -23,11 +23,9 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 /**
  * Controller used to manage current user.
  *
- * @IsGranted("ROLE_USER")
- *
  * @author Romain Monteil <monteil.romain@gmail.com>
  */
-#[Route('/profile')]
+#[Route('/profile'), IsGranted('ROLE_USER')]
 class UserController extends AbstractController
 {
     #[Route('/edit', methods: ['GET', 'POST'], name: 'user_edit')]

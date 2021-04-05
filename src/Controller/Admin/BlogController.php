@@ -31,12 +31,10 @@ use Symfony\Component\Routing\Annotation\Route;
  *
  * See http://knpbundles.com/keyword/admin
  *
- * @IsGranted("ROLE_ADMIN")
- *
  * @author Ryan Weaver <weaverryan@gmail.com>
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  */
-#[Route('/admin/post')]
+#[Route('/admin/post'), IsGranted('ROLE_ADMIN')]
 class BlogController extends AbstractController
 {
     /**
@@ -125,10 +123,9 @@ class BlogController extends AbstractController
 
     /**
      * Displays a form to edit an existing Post entity.
-     *
-     * @IsGranted("edit", subject="post", message="Posts can only be edited by their authors.")
      */
     #[Route('/{id<\d+>}/edit', methods: ['GET', 'POST'], name: 'admin_post_edit')]
+    #[IsGranted('edit', subject: 'post', message: 'Posts can only be edited by their authors.')]
     public function edit(Request $request, Post $post): Response
     {
         $form = $this->createForm(PostType::class, $post);
@@ -150,10 +147,9 @@ class BlogController extends AbstractController
 
     /**
      * Deletes a Post entity.
-     *
-     * @IsGranted("delete", subject="post")
      */
     #[Route('/{id}/delete', methods: ['POST'], name: 'admin_post_delete')]
+    #[IsGranted('delete', subject: 'post')]
     public function delete(Request $request, Post $post): Response
     {
         if (!$this->isCsrfTokenValid('delete', $request->request->get('token'))) {

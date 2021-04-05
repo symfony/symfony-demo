@@ -23,13 +23,10 @@ use function Symfony\Component\String\u;
 
 class AppFixtures extends Fixture
 {
-    private $passwordEncoder;
-    private $slugger;
-
-    public function __construct(UserPasswordEncoderInterface $passwordEncoder, SluggerInterface $slugger)
-    {
-        $this->passwordEncoder = $passwordEncoder;
-        $this->slugger = $slugger;
+    public function __construct(
+        private UserPasswordEncoderInterface $passwordEncoder,
+        private SluggerInterface $slugger
+    ) {
     }
 
     public function load(ObjectManager $manager): void
